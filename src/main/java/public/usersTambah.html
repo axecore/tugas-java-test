@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah User</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <h2>Form Tambah User</h2>
+
+    <form id="addUserForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="username">Password:</label>
+        <input type="text" id="password" name="password" required><br><br>
+
+        <label for="level">Level:</label>
+        <select id="level" name="level" required>
+            <option value="Admin">Admin</option>
+            <option value="User">User</option>
+        </select><br><br>
+
+        <button type="submit">Tambah</button>
+    </form>
+    <br>
+    <a href="/users">Kembali</a>
+    <div id="responseMessage"></div>
+
+    <script>
+        // Menangani submit form
+        $("#addUserForm").submit(function(event) {
+            event.preventDefault(); // Mencegah form submit standar
+
+            // Mengambil data dari form
+            const username = $("#username").val();
+            const level = $("#level").val();
+            const password = $("#password").val();
+
+            // Membuat objek data untuk dikirim ke server
+            const userData = {
+                username: username,
+                level: level,
+                password: password
+            };
+
+            // Mengirim data menggunakan AJAX POST
+            $.ajax({
+                url: '/users/api/tambah',  // API endpoint
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(userData),  // Mengirim data sebagai JSON
+                success: function(response) {
+                   window.location.href = '/users';
+                },
+                error: function(xhr, status, error) {
+                  
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

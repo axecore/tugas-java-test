@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Edit User</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <h2>Form Edit User</h2>
+
+    <form id="editUserForm" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">Password:</label>
+        <input type="text" id="password" name="password" required><br><br>
+
+        <label for="level">Level:</label>
+        <select id="level" name="level" required>
+            <option value="Admin">Admin</option>
+            <option value="User">User</option>
+        </select><br><br>
+
+        <button type="submit">Edit</button>
+    </form>
+    <br>
+    <a href="/users">Kembali</a>
+    <div id="responseMessage"></div>
+
+    <script>
+       $(document).ready(function() {
+            // Dapatkan query string dari URL
+            const queryString = window.location.search;
+
+            // Menggunakan regular expression untuk menangkap angka setelah '='
+            const match = queryString.match(/\?=\d+/);
+
+            if (match) {
+                // Mengambil nilai setelah '='
+                const userId = match[0].slice(2);  // Menghapus '?=' dan mengambil angka
+                
+                // Lakukan request AJAX GET untuk mengambil data user berdasarkan ID
+                $.ajax({
+                    url: `/users/api/get/${userId}`,  // URL dengan nilai ID
+                    method: 'GET',
+                    success: function(response) {
+                        console.log("Data user:", response);
+
+                        // Pastikan data berhasil diterima dan ada
+                        if (response) {
+                            // Isi nilai form dengan data user
+                            $('#username').val(response.username);
+                            $('#password').val(response.password);
+                            $('#level').val(response.level);  // Sesuaikan nilai level (Admin/User)
+                        } else {
+                            $('#responseMessage').html('User not found');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Terjadi kesalahan:", error);
+                        $('#responseMessage').html('Error fetching user data');
+                    }
+                });
+
+                // Submit form dengan AJAX POST untuk mengedit user
+                $('#editUserForm').on('submit', function(event) {
+                    event.preventDefault();  // Mencegah form submit default
+
+                    // Ambil data dari form
+                    const formData = {
+                        username: $('#username').val(),
+                        password: $('#password').val(),
+                        level: $('#level').val()
+                    };
+
+                    // Lakukan request AJAX POST untuk mengedit data user
+                    $.ajax({
+                        url: `/users/api/edit/${userId}`,  // URL untuk mengedit user berdasarkan ID
+                        method: 'POST',
+                        data: JSON.stringify(formData),
+                        success: function(response) {
+                            console.log("User updated:", response);
+                            $('#responseMessage').html('Berhasil update');
+                        },
+                        error: function(xhr, status, error) {
+                            console.log("Terjadi kesalahan:", error);
+                            $('#responseMessage').html('Error updating user data');
+                        }
+                    });
+                });
+            } else {
+                console.log("Parameter edit tidak ditemukan.");
+            }
+        });
+    </script>
+
+</body>
+</html>

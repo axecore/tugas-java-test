@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Kasus</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <h2>Form Tambah Kasus</h2>
+
+    <form id="addUserForm">
+        
+        <label for="no_identintas">No Registrasi:</label>
+        <input type="text" id="no_registrasi" name="no_registrasi" required><br><br>
+        
+        <label for="jk">No Identitas: </label>
+        <select id="no_identitas" name="no_identitas" required>
+           
+        </select><br><br>
+        
+        <label for="jk">Username (user yang menangani): </label>
+        <select id="user_id" name="user_id" required>
+           
+        </select><br><br>
+        
+        <label for="nama">Nama:</label>
+        <input type="text" id="nama" name="nama" required><br><br>
+        
+        <label for="nama">Jenis Kasus:</label>
+        <input type="text" id="jenis_kasus" name="jenis_kasus" required><br><br>
+        
+        <label for="nama">Layanan:</label>
+        <input type="date" id="layanan" name="layanan" required><br><br>
+        
+        <label for="nama">Kronoligis Kasus:</label>
+        <input type="text" id="kronologis_kasis" name="kronologis_kasis" required><br><br>
+        
+ 
+        <button type="submit">Tambah</button>
+    </form>
+    <br>
+    <a href="/kasus">Kembali</a>
+    <div id="responseMessage"></div>
+
+    <script>
+        
+        $(document).ready(function() {
+           
+                $.ajax({
+                    url: `/pemohon/api/get`,  
+                    method: 'GET',
+                    dataType: 'json', 
+                    success: function(response) {
+//                        console.log(response)
+                        if (response) {
+                            // Kosongkan opsi yang ada sebelumnya
+                            $('#no_identintas').empty();
+
+                            // Tambahkan opsi baru berdasarkan data respons
+                            response.forEach(function(item) {
+                                $('#no_identitas').append(`<option value="${item.no_identintas}">${item.no_identintas} - ${item.nama}</option>`);
+                            });
+                        } else {
+                            $('#responseMessage').html('User not found');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Terjadi kesalahan:", error);
+                        $('#responseMessage').html('Error fetching user data');
+                    }
+                });
+                
+                
+                $.ajax({
+                    url: `/users/api/get`,  
+                    method: 'GET',
+                    dataType: 'json', 
+                    success: function(response) {
+//                        console.log(response)
+                        if (response) {
+                            
+                            // Kosongkan opsi yang ada sebelumnya
+                            $('#user_id').empty();
+
+                            // Tambahkan opsi baru berdasarkan data respons
+                            response.forEach(function(item) {
+                                $('#user_id').append(`<option value="${item.id}">${item.id} - ${item.username}</option>`);
+                            });
+                        } else {
+                            $('#responseMessage').html('User not found');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Terjadi kesalahan:", error);
+                        $('#responseMessage').html('Error fetching user data');
+                    }
+                });
+           
+        });
+        
+        // Menangani submit form
+        $("#addUserForm").submit(function(event) {
+            event.preventDefault(); // Mencegah form submit standar
+
+            // Mengambil data dari form
+            const no_registrasi = $("#no_registrasi").val();
+            const no_identitas = $("#no_identitas").val();
+            const user_id = $("#user_id").val();
+            const nama = $("#nama").val();
+            const jenis_kasus = $("#jenis_kasus").val();
+            const layanan = $("#layanan").val();
+            const kronologis_kasis = $("#kronologis_kasis").val();
+          
+            // Membuat objek data untuk dikirim ke server
+            const userData = {
+                no_registrasi: no_registrasi,
+                no_identitas: no_identitas,
+                user_id: user_id,
+                nama: nama,
+                jenis_kasus: jenis_kasus,
+                layanan: layanan,
+                kronologis_kasis: kronologis_kasis
+            };
+
+            // Mengirim data menggunakan AJAX POST
+            $.ajax({
+                url: '/kasus/api/tambah',  // API endpoint
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(userData),  // Mengirim data sebagai JSON
+                success: function(response) {
+                   window.location.href = '/kasus';
+                },
+                error: function(xhr, status, error) {
+                  
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

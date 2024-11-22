@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Pemohon</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <h2>Form Edit Pemohon</h2>
+
+    <form id="editUserForm">
+        
+        <label for="no_identintas">No Identitas:</label>
+        <input type="text" id="no_identintas" name="no_identintas" required><br><br>
+        
+        <label for="nama">Nama:</label>
+        <input type="text" id="nama" name="nama" required><br><br>
+        
+        <label for="jk">Jenis Kelamin: </label>
+        <select id="jk" name="jk" required>
+            <option value="Laki-Laki">Laki-Laki</option>
+            <option value="Perempuan">Perempuan</option>
+        </select><br><br>
+        
+        <label for="nama">Alamat:</label>
+        <input type="text" id="alamat" name="alamat" required><br><br>
+        
+        <label for="nama">Tempat Lahir:</label>
+        <input type="text" id="tempat_lahir" name="tempat_lahir" required><br><br>
+        
+        <label for="nama">Tanggal Lahir:</label>
+        <input type="date" id="tgl_lahir" name="tgl_lahir" required><br><br>
+        
+        <label for="nama">Pekerjaan:</label>
+        <input type="text" id="pekerjaan" name="pekerjaan" required><br><br>
+        
+        <label for="jk">Agama: </label>
+        <select id="agama" name="agama" required>
+            <option value="Islam">Islam</option>
+            <option value="Kristen">Kristen</option>
+        </select><br><br>
+        
+        <label for="nama">Kewarganegaraan: </label>
+        <input type="text" id="kewarganegaraan" name="kewarganegaraan" required><br><br>
+        
+        <label for="jk">Status: </label>
+        <select id="status" name="status" required>
+            <option value="Kawin">Kawin</option>
+            <option value="Tidak Kawin">Tidak Kawin</option>
+        </select><br><br>
+        
+        <label for="nama">No. Telpon:</label>
+        <input type="text" id="no_telpon" name="no_telpon" required><br><br>
+        
+        <label for="nama">Email:</label>
+        <input type="text" id="email" name="email" required><br><br>
+
+        <button type="submit">Update</button>
+    </form>
+    <br>
+    <a href="/pemohon">Kembali</a>
+    <div id="responseMessage"></div>
+
+    <script>
+        
+        
+        $(document).ready(function() {
+            // Dapatkan query string dari URL
+            const queryString = window.location.search;
+
+            // Menggunakan regular expression untuk menangkap angka setelah '='
+            const match = queryString.match(/\?=\d+/);
+
+            if (match) {
+  
+                const userId = match[0].slice(2);
+                
+                $.ajax({
+                    url: `/pemohon/api/get/${userId}`,  
+                    method: 'GET',
+                    dataType: 'json', 
+                    success: function(response) {
+//                        console.log(response)
+                        if (response) {
+                            const no_identintas = $("#no_identintas").val(response.no_identintas);
+                            const nama = $("#nama").val(response.nama);
+                            const jk = $("#jk").val(response.jk);
+                            const alamat = $("#alamat").val(response.alamat);
+                            const tempat_lahir = $("#tempat_lahir").val(response.tempat_lahir);
+                            const tgl_lahir = $("#tgl_lahir").val(response.tgl_lahir);
+                            const pekerjaan = $("#pekerjaan").val(response.pekerjaan);
+                            const agama = $("#agama").val(response.agama);
+                            const kewarganegaraan = $("#kewarganegaraan").val(response.kewarganegaraan);
+                            const status = $("#status").val(response.status);
+                            const no_telpon = $("#no_telpon").val(response.no_telpon);
+                            const email = $("#email").val(response.email);
+                        } else {
+                            $('#responseMessage').html('User not found');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Terjadi kesalahan:", error);
+                        $('#responseMessage').html('Error fetching user data');
+                    }
+                });
+
+                // Submit form dengan AJAX POST untuk mengedit user
+                $('#editUserForm').on('submit', function(event) {
+                    event.preventDefault();  // Mencegah form submit default
+
+                    // Ambil data dari form
+                    // Mengambil data dari form
+                    const no_identintas = $("#no_identintas").val();
+                    const nama = $("#nama").val();
+                    const jk = $("#jk").val();
+                    const alamat = $("#alamat").val();
+                    const tempat_lahir = $("#tempat_lahir").val();
+                    const tgl_lahir = $("#tgl_lahir").val();
+                    const pekerjaan = $("#pekerjaan").val();
+                    const agama = $("#agama").val();
+                    const kewarganegaraan = $("#kewarganegaraan").val();
+                    const status = $("#status").val();
+                    const no_telpon = $("#no_telpon").val();
+                    const email = $("#email").val();
+
+                    // Membuat objek data untuk dikirim ke server
+                    const userData = {
+                        no_identintas: no_identintas,
+                        nama: nama,
+                        jk: jk,
+                        alamat: alamat,
+                        tempat_lahir: tempat_lahir,
+                        tgl_lahir: tgl_lahir,
+                        pekerjaan: pekerjaan,
+                        agama: agama,
+                        kewarganegaraan: kewarganegaraan,
+                        status: status,
+                        no_telpon: no_telpon,
+                        email: email,
+                    };
+
+                    // Lakukan request AJAX POST untuk mengedit data user
+                    $.ajax({
+                        url: `/pemohon/api/edit/${userId}`,  // URL untuk mengedit user berdasarkan ID
+                        method: 'POST',
+                        data: JSON.stringify(userData),
+                        success: function(response) {
+                            $('#responseMessage').html('Berhasil update');
+                        },
+                        error: function(xhr, status, error) {
+                            console.log("Terjadi kesalahan:", error);
+                            $('#responseMessage').html('Error updating user data');
+                        }
+                    });
+                });
+            } else {
+                console.log("Parameter edit tidak ditemukan.");
+            }
+        });
+        
+        
+        
+        
+        
+        
+        // Menangani submit form
+        $("#addUserForm").submit(function(event) {
+            event.preventDefault(); // Mencegah form submit standar
+
+            // Mengambil data dari form
+            const no_identintas = $("#no_identintas").val();
+            const nama = $("#nama").val();
+            const jk = $("#jk").val();
+            const alamat = $("#alamat").val();
+            const tempat_lahir = $("#tempat_lahir").val();
+            const tgl_lahir = $("#tgl_lahir").val();
+            const pekerjaan = $("#pekerjaan").val();
+            const agama = $("#agama").val();
+            const kewarganegaraan = $("#kewarganegaraan").val();
+            const status = $("#status").val();
+            const no_telpon = $("#no_telpon").val();
+            const email = $("#email").val();
+
+            // Membuat objek data untuk dikirim ke server
+            const userData = {
+                no_identintas: no_identintas,
+                nama: nama,
+                jk: jk,
+                alamat: alamat,
+                tempat_lahir: tempat_lahir,
+                tgl_lahir: tgl_lahir,
+                pekerjaan: pekerjaan,
+                agama: agama,
+                kewarganegaraan: kewarganegaraan,
+                status: status,
+                no_telpon: no_telpon,
+                email: email,
+            };
+
+           
+        });
+    </script>
+
+</body>
+</html>
