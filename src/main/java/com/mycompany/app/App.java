@@ -539,9 +539,10 @@ public class App {
                     String nama_advokat = userData.get("nama_advokat");
                     String asisten_advokat = userData.get("asisten_advokat");
                     String layanan = userData.get("layanan");
+                    String no_registrasi = userData.get("no_registrasi");
  
                     // Tambahkan user ke database
-                    new APIJadwal().addJadwalToDatabase(user_id, tanggal, hari, jam, nama_pemohon, nama_advokat, asisten_advokat, layanan);
+                    new APIJadwal().addJadwalToDatabase(user_id, tanggal, hari, jam, nama_pemohon, nama_advokat, asisten_advokat, layanan, no_registrasi);
 
                     // Kirim respons sukses
                     String response = "{\"message\": \"Kasus berhasil ditambahkan\"}";
@@ -582,7 +583,8 @@ public class App {
                         String nama_advokat = userData.get("nama_advokat");
                         String asisten_advokat = userData.get("asisten_advokat");
                         String layanan = userData.get("layanan");
-                        new APIJadwal().updateJadwalInDatabase(userId, user_id, tanggal, hari, jam, nama_pemohon, nama_advokat, asisten_advokat, layanan);
+                        String no_registrasi = userData.get("no_registrasi");
+                        new APIJadwal().updateJadwalInDatabase(userId, user_id, tanggal, hari, jam, nama_pemohon, nama_advokat, asisten_advokat, layanan, no_registrasi);
 
                         // Kirim respons sukses
                         String response = "{\"message\": \"User berhasil diupdate\"}";

@@ -61,8 +61,9 @@ public class APIJadwal implements HttpHandler {
                 String nama_advokat = requestBody.get("nama_advokat");
                 String asisten_advokat = requestBody.get("asisten_advokat");
                 String layanan = requestBody.get("layanan");
+                String no_registrasi = requestBody.get("no_registrasi");
               
-                updateJadwalInDatabase(id, user_id, tanggal, hari, jam, nama_pemohon, nama_advokat, asisten_advokat, layanan);
+                updateJadwalInDatabase(id, user_id, tanggal, hari, jam, nama_pemohon, nama_advokat, asisten_advokat, layanan, no_registrasi);
 
                 String response = "{\"message\": \"User updated successfully\"}";
                 sendResponse(exchange, 200, response);
@@ -88,8 +89,9 @@ public class APIJadwal implements HttpHandler {
             String nama_advokat = requestBody.get("nama_advokat");
             String asisten_advokat = requestBody.get("asisten_advokat");
             String layanan = requestBody.get("layanan");
+            String no_registrasi = requestBody.get("no_registrasi");
 
-            addJadwalToDatabase(user_id, tanggal, hari, jam, nama_pemohon, nama_advokat, asisten_advokat, layanan);
+            addJadwalToDatabase(user_id, tanggal, hari, jam, nama_pemohon, nama_advokat, asisten_advokat, layanan, no_registrasi);
 
             String response = "{\"message\": \"User added successfully\"}";
             sendResponse(exchange, 200, response);
@@ -169,8 +171,8 @@ public class APIJadwal implements HttpHandler {
     }
         
     // Method untuk menambahkan  ke database
-    void addJadwalToDatabase(String user_id, String tanggal, String hari, String jam, String nama_pemohon, String nama_advokat, String asisten_advokat, String layanan) {
-        String sql = "INSERT INTO jadwal (user_id, tanggal, hari, jam, nama_pemohon, nama_advokat, asisten_advokat, layanan) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    void addJadwalToDatabase(String user_id, String tanggal, String hari, String jam, String nama_pemohon, String nama_advokat, String asisten_advokat, String layanan, String no_registrasi) {
+        String sql = "INSERT INTO jadwal (user_id, tanggal, hari, jam, nama_pemohon, nama_advokat, asisten_advokat, layanan, kasus_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -182,6 +184,7 @@ public class APIJadwal implements HttpHandler {
             pstmt.setString(6, nama_advokat);
             pstmt.setString(7, asisten_advokat);
             pstmt.setString(8, layanan);
+            pstmt.setString(9, no_registrasi);
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -192,9 +195,10 @@ public class APIJadwal implements HttpHandler {
         // Method untuk mengambil detail dari database berdasarkan ID
     Map<String, Object> getJadwalDetailsFromDatabase(int userId) {
         Map<String, Object> data = null;
-        String sql = "SELECT jadwal.id, users.username, jadwal.tanggal, jadwal.hari, jadwal.jam, jadwal.nama_pemohon, jadwal.nama_advokat, jadwal.asisten_advokat, jadwal.layanan " +
+        String sql = "SELECT jadwal.id, users.username, kasus.no_registrasi, kasus.id AS kasus_id, jadwal.tanggal, jadwal.hari, jadwal.jam, jadwal.nama_pemohon, jadwal.nama_advokat, jadwal.asisten_advokat, jadwal.layanan " +
                      "FROM jadwal " +
-                     "LEFT JOIN users ON users.id = jadwal.user_id WHERE jadwal.id = ?";
+                     "LEFT JOIN users ON users.id = jadwal.user_id " +
+                     "LEFT JOIN kasus ON kasus.id = jadwal.kasus_id WHERE jadwal.id = ?";
 
         
         try (Connection conn = DB.getConnection();
@@ -215,6 +219,8 @@ public class APIJadwal implements HttpHandler {
                 data.put("nama_advokat", rs.getString("nama_advokat"));
                 data.put("asisten_advokat", rs.getString("asisten_advokat"));
                 data.put("layanan", rs.getString("layanan"));
+                data.put("no_registrasi", rs.getString("no_registrasi"));
+                data.put("kasus_id", rs.getString("kasus_id"));
                
             }
         } catch (SQLException e) {
@@ -224,9 +230,9 @@ public class APIJadwal implements HttpHandler {
     }
     
     // Method untuk memperbarui data berdasarkan ID
-    void updateJadwalInDatabase(int id, String user_id, String tanggal, String hari, String jam, String nama_pemohon, String nama_advokat, String asisten_advokat, String layanan) {
+    void updateJadwalInDatabase(int id, String user_id, String tanggal, String hari, String jam, String nama_pemohon, String nama_advokat, String asisten_advokat, String layanan, String no_registrasi) {
         
-        String sql = "UPDATE jadwal SET user_id = ?, tanggal = ?, hari = ?, jam = ?, nama_pemohon = ?, nama_advokat = ?, asisten_advokat = ?, layanan = ?  WHERE id = ?";
+        String sql = "UPDATE jadwal SET user_id = ?, tanggal = ?, hari = ?, jam = ?, nama_pemohon = ?, nama_advokat = ?, asisten_advokat = ?, layanan = ?, kasus_id = ?  WHERE id = ?";
         try (Connection conn = DB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -238,7 +244,8 @@ public class APIJadwal implements HttpHandler {
             pstmt.setString(6, nama_advokat);
             pstmt.setString(7, asisten_advokat);
             pstmt.setString(8, layanan);
-            pstmt.setInt(9, id);
+            pstmt.setString(9, no_registrasi);
+            pstmt.setInt(10, id);
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
